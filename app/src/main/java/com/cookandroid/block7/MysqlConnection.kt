@@ -19,9 +19,6 @@ data class Player(
     @SerializedName("gold") var gold: Int,
     @SerializedName("gems") var gems: Int,
     @SerializedName("username") var username: String,
-    @SerializedName("expbook") var expBook: Int,
-    @SerializedName("contractstone") var contractStone: Int,
-    @SerializedName("contract_try_count") var contractTryCount: Int
 )
 
 data class NewPlayer(

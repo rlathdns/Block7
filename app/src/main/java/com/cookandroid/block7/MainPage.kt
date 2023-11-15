@@ -1,6 +1,5 @@
 package com.cookandroid.block7
 
-import DatabaseHelper
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -38,14 +37,9 @@ class MainPage : BaseActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.main_page)
 
-        // 데이터베이스 헬퍼 인스턴스 생성 및 데이터베이스 초기화
-        val dbHelper = DatabaseHelper(this)
-        dbHelper.writableDatabase
-
         val customApplication = application as CustomApplication
         val studentId = customApplication.studentId
 
-        dbHelper.insertNewPlayer(studentId)
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
@@ -55,9 +49,7 @@ class MainPage : BaseActivity() {
         val levelprogress: ProgressBar = findViewById(R.id.level_progress)
 
         levelprogress.visibility = View.VISIBLE
-
         userid.setText(studentId)
-
         levelprogress.max = 100
 
         val mailboxButton: ImageButton = findViewById(R.id.mailbox_button)
@@ -69,29 +61,38 @@ class MainPage : BaseActivity() {
         }
 
         val viewPager: ViewPager2 = findViewById(R.id.viewPager)
-        val banneradapter = BannerAdapter()
-        viewPager.adapter = banneradapter
+        val bannerAdapter = BannerAdapter()
+        viewPager.adapter = bannerAdapter
 
-        val startPage = Integer.MAX_VALUE / 2
-        val startPosition = startPage - (startPage % banneradapter.banners.size)
-        viewPager.setCurrentItem(startPosition, false)
+        val handler = Handler(Looper.getMainLooper())
+        val run = object : Runnable {
+            override fun run() {
+                var currentPosition = viewPager.currentItem
+                val itemCount = bannerAdapter.itemCount
+                currentPosition = if (currentPosition == itemCount - 1) 0 else currentPosition + 1
+                viewPager.setCurrentItem(currentPosition, true) // true to enable smooth scrolling
+                handler.postDelayed(this, 3000) // 3000 milliseconds delay for auto slide
+            }
+        }
+        handler.postDelayed(run, 3000) // Start auto slide with a delay
 
+// Registering the OnPageChangeCallback to reset the auto slider timer when user interacts with ViewPager
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                val lastPage = banneradapter.itemCount - 1
-                if (position == 0) {
-                    viewPager.setCurrentItem(lastPage - 1, false)
-                } else if (position == lastPage) {
-                    viewPager.setCurrentItem(1, false)
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                when (state) {
+                    ViewPager2.SCROLL_STATE_IDLE -> handler.postDelayed(run, 3000)
+                    ViewPager2.SCROLL_STATE_DRAGGING -> handler.removeCallbacks(run)
+                    ViewPager2.SCROLL_STATE_SETTLING -> handler.removeCallbacks(run)
                 }
             }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // Assuming you have set the adapter to loop, add logic to jump to the start/end accordingly
+            }
         })
-        val character_tap_button:ImageButton = findViewById(R.id.character_tap_button)
-        character_tap_button.setOnClickListener {
-            val intent = Intent(this, CharacterActivity::class.java)
-            startActivity(intent)
-        }
+
 
         val contract_tap_button:ImageButton = findViewById(R.id.contract_tap_button)
         contract_tap_button.setOnClickListener {
@@ -136,12 +137,10 @@ class MainPage : BaseActivity() {
                 username.text = username_value
                 gem_value_layout.text = gem_value.toString()
                 gold_value_layout.text = gold_value.toString()
-                level_layout.text = "Lv$level_value"
+                level_layout.text = "$level_value"
 
                 val levelprogress: ProgressBar = findViewById(R.id.level_progress)
                 levelprogress.progress = current_exp_value
-
-
 
                 val customApplication = application as CustomApplication
                 customApplication.user_name = username_value
