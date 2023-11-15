@@ -1,0 +1,60 @@
+package com.cookandroid.block7
+
+class Level {
+    private val levelExperienceMap: Map<Int, Int> = mapOf(
+        1 to 100,
+        2 to 110,
+        3 to 121,
+        4 to 133,
+        5 to 146,
+        6 to 160,
+        7 to 176,
+        8 to 193,
+        9 to 212,
+        10 to 233,
+        11 to 256,
+        12 to 281,
+        13 to 309,
+        14 to 339,
+        15 to 372,
+        16 to 409,
+        17 to 449,
+        18 to 493,
+        19 to 542,
+        20 to 596,
+        21 to 655,
+        22 to 720,
+        23 to 792,
+        24 to 871,
+        25 to 958,
+        26 to 1053,
+        27 to 1158,
+        28 to 1273,
+        29 to 1400,
+        30 to 1540,
+        31 to 1694,
+        32 to 1863,
+        33 to 2049,
+        34 to 2253,
+        35 to 2478,
+        36 to 2725,
+        37 to 2997,
+        38 to 3296,
+        39 to 3625,
+        40 to 3987,
+        41 to 4385,
+        42 to 4823,
+        43 to 5305,
+        44 to 5835,
+        45 to 6418,
+        46 to 7059,
+        47 to 7764,
+        48 to 8540,
+        49 to 9394,
+        50 to 10333
+    )
+
+    fun getExperienceRequiredForLevel(level: Int?): Int? {
+        return levelExperienceMap[level]
+    }
+}

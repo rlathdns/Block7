@@ -50,7 +50,6 @@ class MainPage : BaseActivity() {
 
         levelprogress.visibility = View.VISIBLE
         userid.setText(studentId)
-        levelprogress.max = 100
 
         val mailboxButton: ImageButton = findViewById(R.id.mailbox_button)
 
@@ -101,8 +100,6 @@ class MainPage : BaseActivity() {
         }
     }
 
-    //맨 아래
-
     override fun onResume() {
         super.onResume()
         handler.post(updateRunnable) // 시작
@@ -123,10 +120,11 @@ class MainPage : BaseActivity() {
     private fun updateUserData(studentId: String) {
         mysqlConnection.getPlayerByStudentId(studentId) { player ->
             runOnUiThread {
+
                 val username_value = player?.username ?: "No Value found"
                 val gem_value = player?.gems
                 val gold_value = player?.gold
-                val level_value = player?.level
+                val level_value = player?.level ?:1
                 val current_exp_value = player?.currentExp ?: 0
 
                 val username: TextView = findViewById(R.id.user_name)
@@ -139,8 +137,14 @@ class MainPage : BaseActivity() {
                 gold_value_layout.text = gold_value.toString()
                 level_layout.text = "$level_value"
 
-                val levelprogress: ProgressBar = findViewById(R.id.level_progress)
-                levelprogress.progress = current_exp_value
+                val level = Level()
+                val levelProgress: ProgressBar = findViewById(R.id.level_progress)
+                levelProgress.progress = current_exp_value
+
+                val experienceRequired = level.getExperienceRequiredForLevel(level_value) ?: 0
+                levelProgress.max = experienceRequired
+
+
 
                 val customApplication = application as CustomApplication
                 customApplication.user_name = username_value
